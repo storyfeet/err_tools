@@ -1,0 +1,17 @@
+[package]
+name = "err_tools"
+version = "0.1.0"
+authors = ["storyfeet <thebeaky@psmail.net>"]
+edition = "2018"
+license = "MIT"
+description = "Helper traits and functions for building errors in rust"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name="err_tools"
+path="src/lib.rs"
+
+[dependencies]
+anyhow = "1.0.31"
+thiserror = "1.0.20"
