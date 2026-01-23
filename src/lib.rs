@@ -22,16 +22,46 @@ pub struct SError(pub &'static str);
 #[error("{}",.0)]
 pub struct SgError(pub String);
 
+/**
+* Create an anyhow result from a static str
+* Userful for quick comparisons
+*/
 pub fn e_str<T>(s: &'static str) -> anyhow::Result<T> {
     Err(SError(s).into())
 }
 
+/**
+* Create an anyhow result from a String
+* Userful for putting info in the string
+*/
 pub fn e_string<T>(s: String) -> anyhow::Result<T> {
     Err(SgError(s).into())
 }
+
+/**
+* This trait applies to any Option and allows easy handling error cases.
+*/
 pub trait OpError: Sized {
     type V;
     fn op_err(self) -> Option<Self::V>;
+
+    /**
+     * Convert option to result with string error
+     *
+     * ```
+     *
+     * use err_tools::*;
+     * fn may_error(op:Option<i32>)-> anyhow::Result<i32> {
+     *   let n = op.e_str("option must be provided")?;
+     *   Ok(n + 2)
+     * }
+     *
+     * assert_eq!(5, may_error(Some(3)).unwrap());
+     *
+     * assert_eq!("option must be provided", may_error(None).err().unwrap().to_string());
+     *
+     * ```
+     */
     fn e_str(self, s: &'static str) -> anyhow::Result<Self::V> {
         self.op_err().ok_or(SError(s).into())
     }
