@@ -39,6 +39,30 @@ pub fn e_string<T>(s: String) -> anyhow::Result<T> {
 }
 
 /**
+* Create an anyhow::Err using format args
+*
+* ```
+*   #[macro_use]
+*   use err_tools::*;
+*
+*   fn do_thing(n:i32)->anyhow::Result<i32>{
+*       return e_format!("a b {}",n);
+*   }
+*
+*   assert_eq!(
+*       "a b 3",
+*       do_thing(3).err().unwrap().to_string()
+*   );
+* ```
+*/
+#[macro_export]
+macro_rules! e_format {
+    ($($arg:tt)*) => {
+        Err(SgError(format!($($arg)*)).into())
+    };
+}
+
+/**
 * This trait applies to any Option and allows easy handling error cases.
 */
 pub trait OpError: Sized {
