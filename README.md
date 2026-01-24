@@ -8,26 +8,30 @@ By Matthew Stoodley
 Purpose
 ------
 
-'err tools' provides traits to make it easy to convert errors inline.
+'err tools' provides traits to make it easy to convert errors in anyhow::Err values,
+in order to keep the error handling 'explicit', but out of the way.
 
-It enables you to replace
+It enables you to replace 
 
 ```rs
 
-let mut x = match fn_that_returns_option() {
-    Option(val)=>val,
-    None => return Err(SomeErrorClass::new()),
-};
+let mut x = fn_that_returns_option().ok_or(SomeFileError::new())?;
 
 ```
-
 With 
 
 ```rs
 
-let mut x = fn_that_returns_option().op_err(SomeErrorClass::new())?;
+let mut x = fn_that_returns_option().e_str("Could not load file")?;
 
 ```
+
+To produce an error compatible with anyhow::Result
+
+Moreover it allows you to wrap the errors on top of each other, so that you can build a stack trace in terms of the 
+errors as they build up
+
+
 
 
 Dependencies
