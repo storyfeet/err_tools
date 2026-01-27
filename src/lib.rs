@@ -1,3 +1,4 @@
+pub mod stackable;
 use std::fmt::{Debug, Display};
 use thiserror::*;
 
