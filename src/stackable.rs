@@ -9,8 +9,11 @@ pub type TraceResult<T> = Result<T, TraceError>;
 pub struct TraceError(Vec<AtError>);
 
 #[derive(Error, Debug)]
-#[error("{}:{}",.0,.1)]
-pub struct Location(pub &'static str, pub u32);
+#[error("{}:{}",.file,.line)]
+pub struct Location {
+    pub file: &'static str,
+    pub line: u32,
+}
 
 #[derive(Error, Debug)]
 #[error("{} - {}",.loc,.e_type)]
@@ -93,7 +96,10 @@ impl<T> TraceableRes<T> for anyhow::Result<T> {
             TraceError(vec![
                 AtError {
                     e_type: ErrType::Any(e),
-                    loc: Location("--", 0),
+                    loc: Location {
+                        file: "--",
+                        line: 0,
+                    },
                 },
                 err,
             ])

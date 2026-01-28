@@ -33,19 +33,19 @@ macro_rules! e_format {
 macro_rules! e_trace {
     ($lit:literal) => {
         Err(AtError {
-            loc: Location(file!(), line!()),
+            loc: Location{ file:file!(), line:line!()},
             e_type: ErrType::S($lit),
         })
     };
     ($err:expr) => {
         Err(AtError{
-            loc: Location(file!(), line!()),
+            loc: Location{ file:file!(), line:line!()},
             e_type: ErrType::Any($err.into()),
         })
     };
     ($($arg:tt)*) => {
         Err(AtError {
-            loc: Location(file!(), line!()),
+            loc: Location{ file:file!(), line:line!()},
             e_type: ErrType::ST(format!($($arg)*)),
         })
     };
@@ -63,7 +63,7 @@ mod tests {
         let e = r.err().unwrap();
 
         //Assert the location is correct
-        assert_eq!(next_line - 1, e.loc.1);
+        assert_eq!(next_line - 1, e.loc.line);
         match e.e_type {
             ErrType::S(s) => assert_eq!("hello", s),
             ErrType::ST(_) => panic!("Expected 'str' not 'String'"),
@@ -79,7 +79,7 @@ mod tests {
         let e = r.err().unwrap();
 
         //Assert the location is correct
-        assert_eq!(next_line - 1, e.loc.1);
+        assert_eq!(next_line - 1, e.loc.line);
         match e.e_type {
             ErrType::S(_) => panic!("Expected 'String' not 'Str'"),
             ErrType::ST(s) => assert_eq!("hello 24", s),
@@ -96,7 +96,7 @@ mod tests {
         let e = r.err().unwrap();
 
         //Assert the location is correct
-        assert_eq!(next_line - 1, e.loc.1);
+        assert_eq!(next_line - 1, e.loc.line);
         match e.e_type {
             ErrType::S(_) => panic!("Expected 'String' not 'Str'"),
             ErrType::ST(_) => panic!("Expected 'str' not 'String'"),
