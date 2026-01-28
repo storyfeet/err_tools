@@ -11,20 +11,30 @@ Purpose
 'err tools' provides traits to make it easy to convert errors in anyhow::Err values,
 in order to keep the error handling 'explicit', but out of the way.
 
-It enables you to replace 
+It enables you to replace create errors detailed traceable errors.
 
-```rs
+```rust
 
-let mut x = fn_that_returns_option().ok_or(SomeFileError::new())?;
+#[macro_use]
+use err_tools::*;
+use err_tools::stackable::*;
+fn do_thing()->Result<i32,AtError>{
+    e_trace!("I had an issue {}", 20)
+}
+let e_line = line!() - 2;
+
+let x = do_thing();
+let err = x.err().unwrap();
+
+// Note this is readme is included in src/lib.rs for doc_generation
+assert_eq!("src/lib.rs",err.loc.file);
+assert_eq!(e_line,err.loc.line);
+
 
 ```
-With 
 
-```rs
 
-let mut x = fn_that_returns_option().e_str("Could not load file")?;
 
-```
 
 To produce an error compatible with anyhow::Result
 

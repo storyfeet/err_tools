@@ -1,3 +1,7 @@
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+pub struct ReadMeDocTests;
+
 pub mod macros;
 pub mod stackable;
 use std::fmt::{Debug, Display};
