@@ -2,18 +2,21 @@ use thiserror::*;
 
 pub type TraceResult<T> = Result<T, TraceError>;
 
+/**
+* An Error type that contains trace information
+*/
 #[derive(Error, Debug)]
 pub struct TraceError(Vec<AtError>);
 
 #[derive(Error, Debug)]
 #[error("{}:{}",.0,.1)]
-pub struct Location(&'static str, i32);
+pub struct Location(pub &'static str, pub u32);
 
 #[derive(Error, Debug)]
 #[error("{} - {}",.loc,.e_type)]
 pub struct AtError {
-    loc: Location,
-    e_type: ErrType,
+    pub loc: Location,
+    pub e_type: ErrType,
 }
 
 #[derive(Error, Debug)]
@@ -75,6 +78,12 @@ pub trait TraceableRes<T>: Sized {
 impl<T> TraceableRes<T> for TraceResult<T> {
     fn push_err(self, err: AtError) -> TraceResult<T> {
         self.map_err(|e| e.push_err(err))
+    }
+}
+
+impl<T> TraceableRes<T> for Result<T, AtError> {
+    fn push_err(self, e_new: AtError) -> TraceResult<T> {
+        self.map_err(|e_orig| TraceError(vec![e_orig, e_new]))
     }
 }
 

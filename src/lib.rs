@@ -1,3 +1,4 @@
+pub mod macros;
 pub mod stackable;
 use std::fmt::{Debug, Display};
 use thiserror::*;
@@ -37,30 +38,6 @@ pub fn e_str<T>(s: &'static str) -> anyhow::Result<T> {
 */
 pub fn e_string<T>(s: String) -> anyhow::Result<T> {
     Err(SgError(s).into())
-}
-
-/**
-* Create an anyhow::Err using format args
-*
-* ```
-*   #[macro_use]
-*   use err_tools::*;
-*
-*   fn do_thing(n:i32)->anyhow::Result<i32>{
-*       return e_format!("a b {}",n);
-*   }
-*
-*   assert_eq!(
-*       "a b 3",
-*       do_thing(3).err().unwrap().to_string()
-*   );
-* ```
-*/
-#[macro_export]
-macro_rules! e_format {
-    ($($arg:tt)*) => {
-        Err(SgError(format!($($arg)*)).into())
-    };
 }
 
 /**
