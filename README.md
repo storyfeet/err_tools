@@ -18,20 +18,23 @@ Starting with the macro ```err_at``` you can make an error from a static ```&str
 ```rust
 
 #[macro_use]
-use err_tools::*;
-use err_tools::traceable::*;
+use err_tools::{*,traceable::*};
 fn do_thing()->Result<i32,AtError>{
-    err_at_res!("I had an issue {}", 20)
+    err_at_res!("I had {} issues", 20)
 }
-let e_line = line!() - 2;
+// The line and file where the macro is called.
+let e_line = line!() - 3;
+let e_file = file!();
 
 let x = do_thing();
 let err = x.err().unwrap();
 
-// Note this is readme is included in src/lib.rs for doc_generation
-assert_eq!("src/lib.rs",err.loc.file);
+assert_eq!(e_file,err.loc.file);
 assert_eq!(e_line,err.loc.line);
-
+assert_eq!(
+    format!("{}:{} - I had 20 issues",e_file,e_line),
+    err.to_string()
+);
 
 ```
 
