@@ -3,7 +3,7 @@
 pub struct ReadMeDocTests;
 
 pub mod macros;
-pub mod stackable;
+pub mod traceable;
 use std::fmt::{Debug, Display};
 use thiserror::*;
 

@@ -32,22 +32,22 @@ macro_rules! e_format {
 #[macro_export]
 macro_rules! err_at {
     ($lit:literal) => {
-        Err(AtError {
+        AtError {
             loc: Location{ file:file!(), line:line!()},
             e_type: ErrType::S($lit),
-        })
+        }
     };
     ($err:expr) => {
-        Err(AtError{
+        AtError{
             loc: Location{ file:file!(), line:line!()},
             e_type: ErrType::Any($err.into()),
-        })
+        }
     };
     ($($arg:tt)*) => {
-        Err(AtError {
+        AtError {
             loc: Location{ file:file!(), line:line!()},
             e_type: ErrType::ST(format!($($arg)*)),
-        })
+        }
     };
 }
 
@@ -59,23 +59,31 @@ macro_rules! err_at {
 #[macro_export]
 macro_rules! err_at_map {
     () => {
-        |e| AtError {
-            loc: Location {
-                file: file!(),
-                line: line!(),
-            },
-            e_type: ErrType::Any(e),
-        }
+        |e| err_at_res!(e)
+    };
+}
+
+#[macro_export]
+macro_rules! err_at_res {
+    ($($arg:tt)*) => {
+        Err( err_at!($($arg)*))
+    };
+}
+
+#[macro_export]
+macro_rules! err_wrap {
+    ($($arg:tt)*) => {
+        |e| e.push_err(err_at_res!($($arg)*))
     };
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::stackable::*;
+    use crate::traceable::*;
     use std::io;
     #[test]
     fn test_can_create_str_errs_with_err_att() {
-        let r: Result<i32, AtError> = err_at!("hello");
+        let r: Result<i32, AtError> = err_at_res!("hello");
         let next_line = line!();
 
         let e = r.err().unwrap();
@@ -91,7 +99,7 @@ mod tests {
 
     #[test]
     fn test_can_create_string_errs_with_err_at() {
-        let r: Result<i32, AtError> = err_at!("hello {}", 24);
+        let r: Result<i32, AtError> = err_at_res!("hello {}", 24);
         let next_line = line!();
 
         let e = r.err().unwrap();
@@ -108,7 +116,7 @@ mod tests {
     #[test]
     fn test_can_create_any_errs_with_err_at() {
         let r: Result<i32, AtError> =
-            err_at!(io::Error::new(io::ErrorKind::FileTooLarge, "file too big"));
+            err_at_res!(io::Error::new(io::ErrorKind::FileTooLarge, "file too big"));
         let next_line = line!();
 
         let e = r.err().unwrap();

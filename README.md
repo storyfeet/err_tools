@@ -19,9 +19,9 @@ Starting with the macro ```err_at``` you can make an error from a static ```&str
 
 #[macro_use]
 use err_tools::*;
-use err_tools::stackable::*;
+use err_tools::traceable::*;
 fn do_thing()->Result<i32,AtError>{
-    err_at!("I had an issue {}", 20)
+    err_at_res!("I had an issue {}", 20)
 }
 let e_line = line!() - 2;
 
