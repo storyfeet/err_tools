@@ -8,10 +8,32 @@ By Matthew Stoodley
 Purpose
 ------
 
-'err tools' provides traits to make it easy to convert errors in anyhow::Err values,
-in order to keep the error handling 'explicit', but out of the way.
+'err tools' provides tools for maintaining an 'error stack' explicitly, and easily in error handling.
 
-It enables you to replace create errors detailed traceable errors.
+It provides Two Concrete Types:
+
+* ErrorAt 
+    * An Error with a file and line number
+    * The error can be a simple ```&'static str```, or a 'String', or an anyhow::error.
+* ErrorTrace
+    * A list of 'ErrorAt's that itself implements Error
+
+It also provides a set of macros that attach the *current line* and *current file* to the created error.
+
+* ```err_at(err,?fmt_params...)!``` creates an ErrorAt with *Line* and *File* set correctly.    
+    ie: ```option.ok_or(err_at!('No ingredients found'))?```
+* ```err_at_res(err,?fmt_params...)``` creates an Err(ErrorAt) result with *Line* and *File* set correctly    
+    ie: ```return err_at_res('A new error')```
+* ```err_at_map!``` A closure to add location to the given error     
+    ie: ```err.map_err(err_at_map!())```
+* ```err_wrap!(err,?fmt_params...)``` Wrap the current error with another error, creating a stack trace
+    ie : ```err.map_err(err_wrap!('Trying to bake a cake'))?```
+    
+
+These keep the error handling 'explicit', but out of the way.
+
+It enables you to create errors detailed traceable errors.
+
 
 Starting with the macro ```err_at``` you can make an error from a static ```&str``` or a 'format string' or any thing that implements ```[
 
@@ -38,23 +60,40 @@ assert_eq!(
 
 ```
 
+However it is designed for building a trace too. 
+To build a full call stack history of the error, more info can be easily added at each return.
 
+```rust
+#[macro_use]
+use err_tools::{*,traceable::*};
 
+fn inner()->Result<i32,AtError>{
+    err_at_res!("inner error")
+}
 
-To produce an error compatible with anyhow::Result
+fn outer()->Result<i32,TraceError>{
+    inner().map_err(err_wrap!("outer error"))
+}
 
-Moreover it allows you to wrap the errors on top of each other, so that you can build a stack trace in terms of the 
-errors as they build up
+let res = outer();
+let e = res.err().unwrap();
+assert_eq!(2,e.trace().len());
 
+```
 
+AtError implements 'into' TraceError, and the err_wrap! macro takes advantage of this.
+
+It also works from anyhow errors, but with other error types it is better to use the err_at!
 
 
 Dependencies
 ------------
 
-It depends on the 'anyhow' crate. Which provides the base ```anyhow::Result<T>```.
-where the actual error depends type is a 
-type is defined a
+* 'anyhow' enables handling all kinds of Errors in the stack.
+* 'thiserror' provides some derivations for the display method.
+
+
+
 
 
 

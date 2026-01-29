@@ -39,6 +39,16 @@ impl std::fmt::Display for TraceError {
     }
 }
 
+impl TraceError {
+    pub fn push_err(mut self, e_new: AtError) -> TraceError {
+        self.0.push(e_new);
+        self
+    }
+    pub fn trace(&self) -> &[AtError] {
+        &self.0
+    }
+}
+
 impl std::fmt::Display for ErrType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         return match self {
@@ -99,36 +109,20 @@ impl<T, E: Traceable> TraceableRes<T> for Result<T, E> {
     }
 }
 
-impl Traceable for TraceError {
-    fn push_err(mut self, e_new: AtError) -> TraceError {
-        self.0.push(e_new);
-        self
-    }
-}
-
-impl Traceable for AtError {
-    fn push_err(self, e_new: AtError) -> TraceError {
-        TraceError(vec![self, e_new])
-    }
-}
-
-impl Traceable for anyhow::Error {
-    fn push_err(self, err: AtError) -> TraceError {
-        TraceError(vec![
-            AtError {
-                e_type: ErrType::Any(self),
-                loc: Location {
-                    file: "--",
-                    line: 0,
-                },
-            },
-            err,
-        ])
-    }
-}
-
 impl Into<TraceError> for AtError {
     fn into(self) -> TraceError {
         TraceError(vec![self])
+    }
+}
+
+impl Into<TraceError> for anyhow::Error {
+    fn into(self) -> TraceError {
+        TraceError(vec![AtError {
+            e_type: ErrType::Any(self),
+            loc: Location {
+                file: "--",
+                line: 0,
+            },
+        }])
     }
 }
