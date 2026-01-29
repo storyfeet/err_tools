@@ -73,7 +73,7 @@ macro_rules! err_at_res {
 #[macro_export]
 macro_rules! err_wrap {
     ($($arg:tt)*) => {
-        |e| e.push_err(err_at_res!($($arg)*))
+        |e| e.push_err(err_at!($($arg)*))
     };
 }
 
