@@ -126,3 +126,9 @@ impl Traceable for anyhow::Error {
         ])
     }
 }
+
+impl Into<TraceError> for AtError {
+    fn into(self) -> TraceError {
+        TraceError(vec![self])
+    }
+}
