@@ -18,7 +18,7 @@ It provides Two Concrete Types:
 * ErrorTrace
     * A list of 'ErrorAt's that itself implements Error
 
-It also provides a set of macros that attach the *current line* and *current file* to the created error.
+It also provides a set of macros that attach the *current line* and *current file* to the created error. These had to be macros, otherwise the line_number and file_name would be applied in the wrong place.
 
 * ```err_at(err,?fmt_params...)!``` creates an ErrorAt with *Line* and *File* set correctly.    
     ie: ```option.ok_or(err_at!('No ingredients found'))?```
@@ -33,7 +33,6 @@ It also provides a set of macros that attach the *current line* and *current fil
 These keep the error handling 'explicit', but out of the way.
 
 It enables you to create errors detailed traceable errors.
-
 
 Starting with the macro ```err_at``` you can make an error from a static ```&str``` or a 'format string' or any thing that implements ```[
 
@@ -94,9 +93,14 @@ Dependencies
 
 
 
+ChangeLog
+---------
 
+# v0.2.1
 
+Removes 'op_err' and 'res_err' from OpErr, and ResErr Traits respectively, and move the implementation from the trait to Option and Result, types.  op_err should not have been used directly, now it can't be.
 
+creates a traceable error and macros to fit with it and include the file_name and line_number.
 
 
 
