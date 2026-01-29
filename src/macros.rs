@@ -30,7 +30,7 @@ macro_rules! e_format {
 *
 */
 #[macro_export]
-macro_rules! e_trace {
+macro_rules! err_at {
     ($lit:literal) => {
         Err(AtError {
             loc: Location{ file:file!(), line:line!()},
@@ -51,13 +51,31 @@ macro_rules! e_trace {
     };
 }
 
+/**
+* Applies a location to the given Error
+*
+* Intended to be used as part of Error::map_e
+*/
+#[macro_export]
+macro_rules! err_at_map {
+    () => {
+        |e| AtError {
+            loc: Location {
+                file: file!(),
+                line: line!(),
+            },
+            e_type: ErrType::Any(e),
+        }
+    };
+}
+
 #[cfg(test)]
 mod tests {
     use crate::stackable::*;
     use std::io;
     #[test]
-    fn test_can_create_str_errs_with_e_trace() {
-        let r: Result<i32, AtError> = e_trace!("hello");
+    fn test_can_create_str_errs_with_err_att() {
+        let r: Result<i32, AtError> = err_at!("hello");
         let next_line = line!();
 
         let e = r.err().unwrap();
@@ -72,8 +90,8 @@ mod tests {
     }
 
     #[test]
-    fn test_can_create_string_errs_with_e_trace() {
-        let r: Result<i32, AtError> = e_trace!("hello {}", 24);
+    fn test_can_create_string_errs_with_err_at() {
+        let r: Result<i32, AtError> = err_at!("hello {}", 24);
         let next_line = line!();
 
         let e = r.err().unwrap();
@@ -88,9 +106,9 @@ mod tests {
     }
 
     #[test]
-    fn test_can_create_any_errs_with_e_trace() {
+    fn test_can_create_any_errs_with_err_at() {
         let r: Result<i32, AtError> =
-            e_trace!(io::Error::new(io::ErrorKind::FileTooLarge, "file too big"));
+            err_at!(io::Error::new(io::ErrorKind::FileTooLarge, "file too big"));
         let next_line = line!();
 
         let e = r.err().unwrap();
