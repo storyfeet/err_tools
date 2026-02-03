@@ -35,19 +35,19 @@ macro_rules! err_at {
         AtError {
             loc: Location{ file:file!(), line:line!()},
             e_type: ErrType::S($lit),
-        }
+        }.into()
     };
     ($err:expr) => {
         AtError{
             loc: Location{ file:file!(), line:line!()},
             e_type: ErrType::Any($err.into()),
-        }
+        }.into()
     };
     ($($arg:tt)*) => {
         AtError {
             loc: Location{ file:file!(), line:line!()},
             e_type: ErrType::ST(format!($($arg)*)),
-        }
+        }.into()
     };
 }
 
