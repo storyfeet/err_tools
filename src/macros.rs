@@ -54,12 +54,13 @@ macro_rules! err_at {
 /**
 * Applies a location to the given Error
 *
-* Intended to be used as part of Error::map_e
+* Intended to be used as part of Result::map_err
+* eg : ```err.map_err(err_at_map!())```
 */
 #[macro_export]
 macro_rules! err_at_map {
     () => {
-        |e| err_at_res!(e)
+        |e| err_at!(e)
     };
 }
 
@@ -79,7 +80,7 @@ macro_rules! err_wrap {
 
 #[cfg(test)]
 mod tests {
-    use crate::traceable::*;
+    use crate::{macros::tests, traceable::*};
     use std::io;
     #[test]
     fn test_can_create_str_errs_with_err_att() {
@@ -126,6 +127,20 @@ mod tests {
         match e.e_type {
             ErrType::S(_) => panic!("Expected 'String' not 'Str'"),
             ErrType::ST(_) => panic!("Expected 'str' not 'String'"),
+            ErrType::Any(any) => assert_eq!("file too big", any.to_string()),
+        }
+    }
+
+    #[test]
+    fn test_can_map_err_to_location() {
+        let res: Result<i32, AtError> =
+            Err(io::Error::new(io::ErrorKind::FileTooLarge, "file too big")).map_err(err_at_map!());
+        let err_line = line!() - 1;
+
+        let e = res.err().unwrap();
+        assert_eq!(err_line, e.loc.line);
+        match e.e_type {
+            ErrType::S(_) | ErrType::ST(_) => panic!("Expected 'Any Error', got string based"),
             ErrType::Any(any) => assert_eq!("file too big", any.to_string()),
         }
     }
