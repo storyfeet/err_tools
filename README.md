@@ -96,6 +96,13 @@ Dependencies
 ChangeLog
 ---------
 
+# v0.2.2
+
+Adds a call to 'into' inside the err_at! macro, so that if you function needs a TraceError or Anyhow::Error, that is automatically covered.
+
+fixes err_at_map macro so that it calls the err_at function not err_at_res,  
+meaning it can be used effectively inside err_map.
+
 # v0.2.1
 
 Removes 'op_err' and 'res_err' from OpErr, and ResErr Traits respectively, and move the implementation from the trait to Option and Result, types.  op_err should not have been used directly, now it can't be.
