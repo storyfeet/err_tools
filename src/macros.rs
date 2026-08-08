@@ -78,6 +78,13 @@ macro_rules! err_wrap {
     };
 }
 
+#[macro_export]
+macro_rules! any_wrap {
+    ($($arg:tt)*) => {
+        |e| Into::<TraceError>::into(anyhow!(e)).push_err(err_at!($($arg)*))
+    };
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{macros::tests, traceable::*};
